@@ -7,7 +7,7 @@ class Bot:
     def __init__(self, token):
         self.commands = {}
         self._handlers = {}
-        self.updater = Updater(token=token, pass_context=True)
+        self.updater = Updater(token=token, use_context=True)
         self.dispatcher = self.updater.dispatcher
 
     def add_command(self, command):
@@ -16,11 +16,13 @@ class Bot:
 
         self.commands[command.name] = command
 
-        self._handlers[command.name] = CommandHandler(command.name, command)
+        self._handlers[command.name] =CommandHandler(command.name, command)
+        self.dispatcher.add_handler(self._handlers[command.name])
 
         if command.aliases:
             for alias in command.aliases:
-                self._handlers[alias] = Command(alias, command)
+                self._handlers[alias] = CommandHandler(alias, command)
+                self.dispatcher.add_handler(self._handlers[alias])
 
     def remove_command(self, command_name):
         if command_name not in self.commands.keys:
@@ -28,23 +30,28 @@ class Bot:
 
         command = self.commands.pop(command_name)
         self._handlers.pop(command_name)
+        self.dispatcher.remove_handler(command_name)
 
         if command.aliases:
             for alias in command.aliases:
                 self._handlers.pop(alias)
+                self.dispatcher.remove_handler(alias)
 
     def command(self, **kwargs):
-        def wrapper(func):
+        def decorater(func):
+            if isinstance(func, Command):
+                raise TypeError("Callback is already a command")
+
             command = Command(self, func, **kwargs)
             self.add_command(command)
             return command
 
-        return wrapper
+        return decorater
 
     def stop(self):
         self.updater.stop()
 
-    def run(self, idle=True):
+    def run(self, *, idle=True):
         self.updater.start_polling()
 
         if idle:

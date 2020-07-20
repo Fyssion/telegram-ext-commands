@@ -36,7 +36,7 @@ class Context:
                 )
 
         return self.me.send_message(
-            self.channel.id, ext=text, parse_mode=parse_mode, reply_to_message_id=reply
+            self.channel.id, text=text, parse_mode=parse_mode, reply_to_message_id=reply
         )
 
     def reply(self, text="", **kwargs):
