@@ -3,7 +3,7 @@
 [![GitHub - License](https://img.shields.io/github/license/Fyssion/telegram-ext-commands)](https://github.com/Fyssion/telegram-ext-commands/blob/master/LICENSE)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-Commands extension for python-telegram-bot based off of discord.py
+Port of the discord.py commands framework to python-telegram-bot
 
 ## Installation
 
