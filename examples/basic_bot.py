@@ -1,6 +1,13 @@
 from telegram.ext import commands
 import telegram
 
+import logging
+
+
+logging.basicConfig(
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
+)
+
 
 bot = commands.Bot(token="token_here")
 

@@ -9,7 +9,7 @@ class Context:
         self.context = context
         self.update_id: int = update.update_id
         self.message = update.effective_message
-        self.channel = update.effective_chat
+        self.chat = update.effective_chat
         self.user = update.effective_user
         self.args = context.args
         self.me = context.bot
@@ -18,7 +18,7 @@ class Context:
         if photo:
             try:
                 return self.me.send_photo(
-                    self.channel.id,
+                    self.chat.id,
                     photo=photo,
                     caption=text,
                     parse_mode=parse_mode,
@@ -27,7 +27,7 @@ class Context:
             except error.BadRequest:
                 photo.seek(0)
                 return self.me.send_document(
-                    self.channel.id,
+                    self.chat.id,
                     document=photo,
                     filename="photo.png",
                     caption=text,
@@ -36,7 +36,7 @@ class Context:
                 )
 
         return self.me.send_message(
-            self.channel.id, text=text, parse_mode=parse_mode, reply_to_message_id=reply
+            self.chat.id, text=text, parse_mode=parse_mode, reply_to_message_id=reply
         )
 
     def reply(self, text="", **kwargs):

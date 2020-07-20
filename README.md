@@ -7,10 +7,10 @@ Commands extension for python-telegram-bot based off of discord.py
 
 ## Installation
 
-Install with your favorite varient of the below:
+Install with your favorite variant of the below:
 
 ```bash
-python3 -m pip install git+https://github.com/Fyssion/python-telegram-bot
+python3 -m pip install git+https://github.com/Fyssion/telegram-ext-commands
 ```
 
 ## Quick Example
