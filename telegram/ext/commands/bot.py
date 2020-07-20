@@ -16,7 +16,7 @@ class Bot:
 
         self.commands[command.name] = command
 
-        self._handlers[command.name] =CommandHandler(command.name, command)
+        self._handlers[command.name] = CommandHandler(command.name, command)
         self.dispatcher.add_handler(self._handlers[command.name])
 
         if command.aliases:
