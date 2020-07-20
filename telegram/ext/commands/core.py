@@ -6,9 +6,10 @@ class Command:
         self.callback = func
         self.bot = bot
         self.name = kwargs.get("name") or func.__name__
-        self.desciption = kwargs.get("description")
+        self.description = kwargs.get("description")
         self.aliases = kwargs.get("aliases") or []
         self.examples = kwargs.get("examples") or []
+        self.hidden = kwargs.get("hidden") or False
 
     def __call__(self, update, context):
         ctx = Context(self, update, context)
