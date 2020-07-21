@@ -18,7 +18,7 @@ This extension is still in development and is subject to breaking changes.
 ```
 - [x] Basic bot and commands
 - [x] Extensions and cogs
-- [ ] Argument parsing
+- [x] Argument parsing
 - [ ] Documentation
 - [ ] HelpCommand
 - [ ] Checks?
