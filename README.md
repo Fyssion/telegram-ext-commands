@@ -3,7 +3,24 @@
 [![GitHub - License](https://img.shields.io/github/license/Fyssion/telegram-ext-commands)](https://github.com/Fyssion/telegram-ext-commands/blob/master/LICENSE)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-Port of the discord.py commands framework to python-telegram-bot
+Port of the [discord.py commands framework](https://discordpy.readthedocs.io/en/latest/ext/commands/index.html) to [python-telegram-bot](https://python-telegram-bot.org/)
+
+## Note
+
+This extension is still in development and is subject to breaking changes.
+
+### Todo list:
+
+```
+- [x] Basic bot and commands
+- [x] Extensions and cogs
+- [ ] Document everything
+- [ ] Add HelpCommand
+- [ ] Add checks?
+- [ ] More that I'm forgetting?
+```
+
+Also note that this extension was made mainly for my personal use.
 
 ## Installation
 
