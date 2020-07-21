@@ -40,4 +40,4 @@ class Context:
         )
 
     def reply(self, text="", **kwargs):
-        self.send(text, reply=self.message.id, **kwargs)
+        self.send(text, reply=self.message.message_id, **kwargs)
