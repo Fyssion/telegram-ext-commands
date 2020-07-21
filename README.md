@@ -11,6 +11,7 @@ telegram and python-telegram-bot.
 ## Note
 
 This extension is still in development and is subject to breaking changes.
+**It is also extremely unstable.**
 
 ### Todo list:
 
