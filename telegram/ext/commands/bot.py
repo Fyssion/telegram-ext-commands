@@ -5,6 +5,7 @@ import importlib
 
 from . import errors
 from .core import command
+from .cog import Cog
 
 
 class Bot:
@@ -14,9 +15,15 @@ class Bot:
         # command_name: handler
         self._handlers = {}
         # extension_name: extension
-        self. _extensions = {}
+        self._extensions = {}
+        # cog_name: cog
+        self._cogs = {}
+
         self.updater = Updater(token=token, use_context=True)
         self.dispatcher = self.updater.dispatcher
+
+    def get_commands(self):
+        return [c for c in self.commands.values() if not c.parent and not c.cog]
 
     def add_command(self, command):
         if command.name in self.commands.keys():
@@ -50,24 +57,52 @@ class Bot:
 
     def command(self, *args, **kwargs):
         def decorater(func):
-            kwargs.setdefault("parent", self)
+            kwargs.setdefault("parent", None)
             result = command(*args, **kwargs)(func)
             self.add_command(result)
             return result
 
         return decorater
 
+    @property
+    def cogs(self):
+        return {c.qualified_name: c for c in self._cogs.values()}
+
+    def add_cog(self, cog):
+        if not isinstance(cog, Cog):
+            raise TypeError("cogs must subclass Cog")
+
+        cog = cog._inject(self)
+        self._cogs[cog.__cog_name__] = cog
+
+    def get_cog(self, name):
+        return self.__cogs.get(name)
+
+    def remove_cog(self, name):
+        cog = self._cogs.pop(name, None)
+        if cog is None:
+            return
+
+        cog._eject(self)
+
     def _is_submodule(self, parent, child):
         return parent == child or child.startswith(parent + ".")
 
     def _remove_module_references(self, name):
+        # find all references to the module
+        # remove the cogs registered from the module
+        for cogname, cog in self._cogs.copy().items():
+            if self._is_submodule(name, cog.__module__):
+                self.remove_cog(cogname)
+
+        # remove commands
         for cmd in self.commands.copy().values():
             if cmd.module is not None and self._is_submodule(name, cmd.module):
                 self.remove_command(cmd.name)
 
     def _call_module_finalizers(self, lib, key):
         try:
-            func = getattr(lib, 'teardown')
+            func = getattr(lib, "teardown")
         except AttributeError:
             pass
         else:
@@ -94,7 +129,7 @@ class Bot:
             raise errors.ExtensionFailed(key, e) from e
 
         try:
-            setup = getattr(lib, 'setup')
+            setup = getattr(lib, "setup")
         except AttributeError:
             del sys.modules[key]
             raise errors.NoEntryPointError(key)
