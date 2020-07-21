@@ -5,6 +5,9 @@
 
 Port of the [discord.py commands framework](https://discordpy.readthedocs.io/en/latest/ext/commands/index.html) to [python-telegram-bot](https://python-telegram-bot.org/)
 
+This extension is mostly modified discord.py code. I had to make some changes and adjustments to fit with
+telegram and python-telegram-bot.
+
 ## Note
 
 This extension is still in development and is subject to breaking changes.

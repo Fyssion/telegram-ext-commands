@@ -2,17 +2,22 @@ from telegram import error
 
 
 class Context:
-    def __init__(self, command, update, context):
+    def __init__(self, command, update, context, *, view):
         self.command = command
         self.bot = command.bot
         self.update = update
         self.context = context
+        self.view = view
         self.update_id: int = update.update_id
         self.message = update.effective_message
         self.chat = update.effective_chat
         self.user = update.effective_user
-        self.args = context.args
+        self.original_args = context.args
+        self.text = self.message.text if self.message else None
         self.me = context.bot
+
+        self.args = []
+        self.kwargs = []
 
     def send(self, text="", *, reply=None, parse_mode=None, photo=None):
         if photo:

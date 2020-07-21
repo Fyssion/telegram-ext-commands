@@ -6,6 +6,8 @@ import importlib
 from . import errors
 from .core import command
 from .cog import Cog
+from .context import Context
+from .view import StringView
 
 
 class Bot:
@@ -22,6 +24,11 @@ class Bot:
         self.updater = Updater(token=token, use_context=True)
         self.dispatcher = self.updater.dispatcher
         self.job_queue = self.updater.job_queue
+
+    def get_context(self, command, update, context, *, cls=Context):
+        view = StringView(" ".join(context.args))
+        ctx = cls(command, update, context, view=view)
+        return ctx
 
     def get_commands(self):
         return [c for c in self.commands.values() if not c.parent and not c.cog]
