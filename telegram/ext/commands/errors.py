@@ -1,8 +1,11 @@
-class CommandError(Exception):
+import telegram
+
+
+class CommandError(telegram.TelegramError):
     pass
 
 
-class BotException(Exception):
+class BotException(telegram.TelegramError):
     pass
 
 

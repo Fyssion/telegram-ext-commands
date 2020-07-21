@@ -4,3 +4,5 @@ from .bot import Bot
 from .core import Command, command
 from .context import Context
 from .cog import Cog
+from .converter import *
+from .errors import *

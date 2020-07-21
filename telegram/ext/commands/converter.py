@@ -1,3 +1,8 @@
+import telegram
+
+from .errors import BadArgument
+
+
 class Converter:
     """The base class of custom converters that require the :class:`.Context`
     to be passed to be useful.
@@ -24,6 +29,61 @@ class Converter:
             The argument that is being converted.
         """
         raise NotImplementedError("Derived classes need to implement this.")
+
+
+def _id_or_mention(argument):
+    try:
+        argument = int(argument)
+        friendly = "ID"
+
+    except ValueError:
+        if not argument.startswith("@"):
+            argument = f"@{argument}"
+
+        friendly = "name"
+
+    return argument, friendly
+
+
+class ChatMemberConverter(Converter):
+    def convert(self, ctx, argument):
+        try:
+            member = ctx.chat.get_member(int(argument))
+
+        except ValueError:
+            raise BadArgument("Member ID must be an int.")
+
+        except telegram.TelegramError:
+            raise BadArgument(f"Member with the ID of '{argument}' not found.")
+
+        else:
+            return member
+
+
+class ChatConverter(Converter):
+    def convert(self, ctx, argument):
+        argument, friendly = _id_or_mention(argument)
+
+        try:
+            chat = ctx.me.get_chat(argument)
+
+        except telegram.TelegramError:
+            raise BadArgument(f"Chat with the {friendly} of '{argument}' not found.")
+
+        else:
+            return chat
+
+
+class StickerSetConverter(Converter):
+    def convert(self, ctx, argument):
+        try:
+            sticker_set = ctx.me.get_sticker_set(argument)
+
+        except telegram.TelegramError:
+            raise BadArgument(f"Chat with the name of '{argument}' not found.")
+
+        else:
+            return sticker_set
 
 
 class _Greedy:

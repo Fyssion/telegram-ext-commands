@@ -9,7 +9,7 @@ from .errors import (
     ArgumentParsingError,
     ConversionError,
     CommandError,
-    MissingRequiredArgument
+    MissingRequiredArgument,
 )
 from . import converter as converters
 
@@ -41,7 +41,7 @@ class Command:
         self.examples = kwargs.get("examples") or []
         self.hidden = kwargs.get("hidden") or False
         self.parent = kwargs.get("parent")
-        self.rest_is_raw = kwargs.get('rest_is_raw', False)
+        self.rest_is_raw = kwargs.get("rest_is_raw", False)
 
     def set_callback(self, function):
         self.callback = function
@@ -55,11 +55,15 @@ class Command:
         # be replaced with the real value for the converters to work later on
         for key, value in self.params.items():
             if isinstance(value.annotation, str):
-                self.params[key] = value = value.replace(annotation=eval(value.annotation, function.__globals__))
+                self.params[key] = value = value.replace(
+                    annotation=eval(value.annotation, function.__globals__)
+                )
 
             # fail early for when someone passes an unparameterized Greedy type
             if value.annotation is converters.Greedy:
-                raise TypeError('Unparameterized Greedy[...] is disallowed in signature.')
+                raise TypeError(
+                    "Unparameterized Greedy[...] is disallowed in signature."
+                )
 
     @property
     def qualified_name(self):

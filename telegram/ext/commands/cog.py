@@ -9,7 +9,9 @@ class CogMeta(type):
         attrs["__cog_settings__"] = command_attrs = kwargs.pop("command_attrs", {})
 
         commands = {}
-        no_bot_cog = "Commands must not start with cog_ or bot_ (in method {0.__name__}.{1})"
+        no_bot_cog = (
+            "Commands must not start with cog_ or bot_ (in method {0.__name__}.{1})"
+        )
 
         new_cls = super().__new__(cls, name, bases, attrs, **kwargs)
         for base in reversed(new_cls.__mro__):
@@ -45,12 +47,11 @@ class Cog(metaclass=CogMeta):
         cmd_attrs = cls.__cog_settings__
 
         # Either update the command with the cog provided defaults or copy it.
-        self.__cog_commands__ = tuple(c._update_copy(cmd_attrs) for c in cls.__cog_commands__)
+        self.__cog_commands__ = tuple(
+            c._update_copy(cmd_attrs) for c in cls.__cog_commands__
+        )
 
-        lookup = {
-            cmd.qualified_name: cmd
-            for cmd in self.__cog_commands__
-        }
+        lookup = {cmd.qualified_name: cmd for cmd in self.__cog_commands__}
 
         # Update the Command instances dynamically as well
         for command in self.__cog_commands__:
