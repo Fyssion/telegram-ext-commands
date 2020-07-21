@@ -43,7 +43,7 @@ class Bot:
                 self.dispatcher.add_handler(self._handlers[alias])
 
     def remove_command(self, command_name):
-        if command_name not in self.commands.keys:
+        if command_name not in self.commands.keys():
             raise ValueError("There is no command with that name")
 
         command = self.commands.pop(command_name)
