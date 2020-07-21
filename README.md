@@ -14,9 +14,10 @@ This extension is still in development and is subject to breaking changes.
 ```
 - [x] Basic bot and commands
 - [x] Extensions and cogs
-- [ ] Document everything
-- [ ] Add HelpCommand
-- [ ] Add checks?
+- [ ] Argument parsing
+- [ ] Documentation
+- [ ] HelpCommand
+- [ ] Checks?
 - [ ] More that I'm forgetting?
 ```
 
