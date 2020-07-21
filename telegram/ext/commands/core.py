@@ -41,6 +41,7 @@ class Command:
         self.examples = kwargs.get("examples") or []
         self.hidden = kwargs.get("hidden") or False
         self.parent = kwargs.get("parent")
+        self.rest_is_raw = kwargs.get('rest_is_raw', False)
 
     def set_callback(self, function):
         self.callback = function
