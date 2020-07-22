@@ -16,12 +16,14 @@ This extension is still in development and is subject to breaking changes.
 ### Todo list:
 
 ```
+Key: [ ] Not started | [/] Incomplete | [x] Complete (I haven't tested it probably)
+
 - [x] Basic bot and commands
 - [x] Extensions and cogs
 - [x] Argument parsing
 - [ ] Documentation
-- [ ] HelpCommand
-- [ ] Checks?
+- [/] HelpCommand
+- [/] Checks?
 - [ ] More that I'm forgetting?
 ```
 
@@ -44,11 +46,11 @@ from telegram.ext import commands
 import telegram
 
 
-bot = commands.Bot(token="token_here")
+bot = commands.Bot(token="token_here", owner_ids=[1234567890])
 
 
-@bot.command(description="Start command for the bot", aliases=["help"])
-def start(ctx):
+@bot.command(description="Greet me", aliases=["hello"])
+def hi(ctx):
     ctx.send("Hi! I'm a bot. I was made with python-telegram-bot and telegram-ext-commands.")
 
 

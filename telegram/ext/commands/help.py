@@ -598,7 +598,9 @@ class DefaultHelpCommand(HelpCommand):
                 else no_category
             )
 
-        filtered = self.filter_commands(bot.commands.values(), sort=True, key=get_category)
+        filtered = self.filter_commands(
+            bot.commands.values(), sort=True, key=get_category
+        )
         to_iterate = itertools.groupby(filtered, key=get_category)
 
         # Now we can add the commands to the page.

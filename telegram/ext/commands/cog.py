@@ -75,7 +75,7 @@ class Cog(metaclass=CogMeta):
     @classmethod
     def _get_overridden_method(cls, method):
         """Return None if the method is not overridden. Otherwise returns the overridden method."""
-        return getattr(method.__func__, '__cog_special_method__', method)
+        return getattr(method.__func__, "__cog_special_method__", method)
 
     def get_commands(self):
         return [c for c in self.__cog_commands__ if not c.parent]

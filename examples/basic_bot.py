@@ -14,9 +14,9 @@ logging.basicConfig(
 bot = commands.Bot(token="token_here", owner_ids=[1234567890])
 
 
-# Create a basic start and help command for the bot
-@bot.command(description="Start command for the bot", aliases=["help"])
-def start(ctx):
+# Create a basic 'hi' command for the bot
+@bot.command(description="Greet me", aliases=["hello"])
+def hi(ctx):
     ctx.send(
         "Hi! I'm a bot. I was made with python-telegram-bot and telegram-ext-commands."
     )

@@ -150,8 +150,8 @@ class Command(_BaseCommand):
         if self.brief is not None:
             return self.brief
         if self.help is not None:
-            return self.help.split('\n', 1)[0]
-        return ''
+            return self.help.split("\n", 1)[0]
+        return ""
 
     @property
     def signature(self):
