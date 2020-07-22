@@ -203,7 +203,7 @@ class Command(_BaseCommand):
             elif self._is_typing_optional(param.annotation):
                 result.append("[%s]" % name)
             else:
-                result.append("Optional[%s]" % name)
+                result.append("[%s]" % name)
 
         return " ".join(result)
 
