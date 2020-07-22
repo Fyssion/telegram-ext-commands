@@ -8,10 +8,13 @@ Port of the [discord.py commands framework](https://discordpy.readthedocs.io/en/
 This extension is mostly modified discord.py code. I had to make some changes and adjustments to fit with
 telegram and python-telegram-bot.
 
+This extension was also made mainly for my personal use.
+
 ## Note
 
 This extension is still in development and is subject to breaking changes.
-**It is also extremely unstable.**
+
+**It is also extremely unstable. DO NOT USE THIS IN PRODUCTION.**
 
 ### Todo list:
 
@@ -26,8 +29,6 @@ Key: [ ] Not started | [/] Incomplete | [x] Complete (I haven't tested it probab
 - [/] Checks?
 - [ ] More that I'm forgetting?
 ```
-
-Also note that this extension was made mainly for my personal use.
 
 ## Installation
 
