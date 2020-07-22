@@ -1,3 +1,5 @@
+import inspect
+
 from ._types import _BaseCommand
 
 
@@ -82,7 +84,23 @@ class Cog(metaclass=CogMeta):
 
     @property
     def qualified_name(self):
+        """:class:`str`: Returns the cog's specified name, not the class name."""
         return self.__cog_name__
+
+    @property
+    def description(self):
+        """:class:`str`: Returns the cog's description, typically the cleaned docstring."""
+        try:
+            return self.__cog_cleaned_doc__
+        except AttributeError:
+            self.__cog_cleaned_doc__ = cleaned = inspect.getdoc(self)
+            return cleaned
+
+    def walk_commands(self):
+        """An iterator that recursively walks through this cog's commands."""
+        for command in self.__cog_commands__:
+            if command.parent is None:
+                yield command
 
     @_cog_special_method
     def cog_unload(self):

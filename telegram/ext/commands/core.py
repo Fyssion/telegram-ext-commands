@@ -153,6 +153,17 @@ class Command(_BaseCommand):
             return self.help.split("\n", 1)[0]
         return ""
 
+    def _is_typing_optional(self, annotation):
+        try:
+            origin = annotation.__origin__
+        except AttributeError:
+            return False
+
+        if origin is not typing.Union:
+            return False
+
+        return annotation.__args__[-1] is type(None)
+
     @property
     def signature(self):
         """:class:`str`: Returns a POSIX-like signature useful for help command output."""

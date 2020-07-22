@@ -529,14 +529,17 @@ class DefaultHelpCommand(HelpCommand):
         The string used when there is a command which does not belong to any category(cog).
         Useful for i18n. Defaults to ``"No Category"``
     title: :class:`str`
-        The title of the help command to be displayed at the top. Defaults to None
+        The title of the help command to be displayed at the top. Defaults to ``None``
+    show_aliases: :class:`bool`
+        Whether to show command aliases in the command list. Defaults to ``False``
     """
 
     def __init__(self, **options):
         self.sort_commands = options.pop("sort_commands", True)
-        self.commands_heading = options.pop("commands_heading", "Commands:")
+        self.commands_heading = options.pop("commands_heading", "Commands")
         self.no_category = options.pop("no_category", "No Category")
         self.title = options.pop("title", None)
+        self.show_aliases = options.pop("show_aliases", False)
 
         super().__init__(**options)
 
@@ -562,12 +565,29 @@ class DefaultHelpCommand(HelpCommand):
 
         formatted = []
 
-        formatted.append(heading)
+        formatted.append("<b>{}:</b>".format(heading))
+
+        def make_entry(name, doc, *, alias_for=None):
+            alias = "[Alias for {}] ".format(alias_for) if alias_for else ""
+
+            if doc:
+                return"/{0} - {1}{2}".format(name, alias, doc)
+            else:
+                entry = "/{}".format(name)
+                if alias:
+                    entry += " {}".format(alias)
+                return entry
 
         for command in commands:
             name = command.name
-            entry = "/{0} - {1}".format(name, command.description)
-            formatted.append(entry)
+            doc = command.short_doc or command.description
+            formatted.append(make_entry(name, doc))
+
+            if self.show_aliases:
+                for alias in command.aliases:
+                    doc = command.short_doc or command.description
+                    entry = make_entry(alias, doc, alias_for=name)
+                    formatted.append(entry)
 
         return formatted
 
@@ -584,16 +604,22 @@ class DefaultHelpCommand(HelpCommand):
 
         help_text = []
 
+        if self.title:
+            # <title> portion
+            help_text.append("<b>{}</b>".format(self.title))
+            help_text.append("")  # blank line
+
         if bot.description:
             # <description> portion
             help_text.append(bot.description)
+            help_text.append("")  # blank line
 
-        no_category = "<b>{0.no_category}:</b>".format(self)
+        no_category = self.no_category
 
         def get_category(command, *, no_category=no_category):
             cog = command.cog
             return (
-                "<b>{}:</b>".format(cog.qualified_name)
+                cog.qualified_name
                 if cog is not None
                 else no_category
             )
@@ -617,7 +643,7 @@ class DefaultHelpCommand(HelpCommand):
 
         note = self.get_ending_note()
         if note:
-            help_text.append("")  # blank line
+            # help_text.append("")  # blank line
             help_text.append(note)
 
         self.send_help_text(help_text)
@@ -638,6 +664,9 @@ class DefaultHelpCommand(HelpCommand):
 
         signature = self.get_command_signature(command)
         help_text.append(signature)
+
+        if command.help:
+            help_text.append(command.help)
 
         return help_text
 
