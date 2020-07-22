@@ -3,15 +3,18 @@ import telegram
 
 import logging
 
-
+# Set up basic logging to get useful info in the console
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
 
+# Create a Bot instance with a token
+# You can specify owner_ids if you wish to use
+# the commands.is_owner() check
+bot = commands.Bot(token="token_here", owner_ids=[1234567890])
 
-bot = commands.Bot(token="token_here")
 
-
+# Create a basic start and help command for the bot
 @bot.command(description="Start command for the bot", aliases=["help"])
 def start(ctx):
     ctx.send(
@@ -19,4 +22,5 @@ def start(ctx):
     )
 
 
+# Run the bot
 bot.run()

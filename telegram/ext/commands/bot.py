@@ -2,16 +2,28 @@ from telegram.ext import Updater, CommandHandler
 
 import sys
 import importlib
+import inspect
 
 from . import errors
 from .core import command
 from .cog import Cog
 from .context import Context
 from .view import StringView
+from .help import HelpCommand, DefaultHelpCommand
+
+
+class _DefaultRepr:
+    def __repr__(self):
+        return "<default-help-command>"
+
+
+_default = _DefaultRepr()
 
 
 class Bot:
-    def __init__(self, token):
+    def __init__(
+        self, token, owner_ids=None, *, help_command=_default, description=None
+    ):
         # name: command
         self.commands = {}
         # command_name: handler
@@ -20,10 +32,47 @@ class Bot:
         self._extensions = {}
         # cog_name: cog
         self._cogs = {}
+        self._checks = []
+        self._check_once = []
+        self._before_invoke = None
+        self._after_invoke = None
+        self.owner_ids = owner_ids or []
+        self._help_command = None
 
         self.updater = Updater(token=token, use_context=True)
         self.dispatcher = self.updater.dispatcher
         self.job_queue = self.updater.job_queue
+
+        self.description = inspect.cleandoc(description) if description else ""
+
+        if help_command is _default:
+            self.help_command = DefaultHelpCommand()
+        else:
+            self.help_command = help_command
+
+        if not self.owner_ids:
+            print(
+                "WARNING: owner_ids is not set. 'bot.is_owner()' will not work property."
+            )
+
+    @property
+    def help_command(self):
+        return self._help_command
+
+    @help_command.setter
+    def help_command(self, value):
+        if value is not None:
+            if not isinstance(value, HelpCommand):
+                raise TypeError("help_command must be a subclass of HelpCommand")
+            if self._help_command is not None:
+                self._help_command._remove_from_bot(self)
+            self._help_command = value
+            value._add_to_bot(self)
+        elif self._help_command is not None:
+            self._help_command._remove_from_bot(self)
+            self._help_command = None
+        else:
+            self._help_command = None
 
     def get_context(self, command, update, context, *, cls=Context):
         view = StringView(" ".join(context.args))
@@ -72,6 +121,54 @@ class Bot:
 
         return decorater
 
+    def check(self, func):
+        self.add_check(func)
+        return func
+
+    def add_check(self, func, *, call_once=False):
+        if call_once:
+            self._check_once.append(func)
+        else:
+            self._checks.append(func)
+
+    def remove_check(self, func, *, call_once=False):
+        l = self._check_once if call_once else self._checks
+
+        try:
+            l.remove(func)
+        except ValueError:
+            pass
+
+    def before_invoke(self, func):
+        self._before_invoke = func
+        return func
+
+    def after_invoke(self, func):
+        self._after_invoke = func
+        return func
+
+    def check_once(self, func):
+        self.add_check(func, call_once=True)
+        return func
+
+    def can_run(self, ctx, *, call_once=False):
+        data = self._check_once if call_once else self._checks
+
+        if len(data) == 0:
+            return True
+
+        passed = True
+        gen = (f(ctx) for f in data)
+
+        for elem in gen:
+            if not elem:
+                passed = False
+
+        return passed
+
+    def is_owner(self, user):
+        return user.id in self.owner_ids
+
     @property
     def cogs(self):
         return {c.qualified_name: c for c in self._cogs.values()}
@@ -84,7 +181,7 @@ class Bot:
         self._cogs[cog.__cog_name__] = cog
 
     def get_cog(self, name):
-        return self.__cogs.get(name)
+        return self._cogs.get(name)
 
     def remove_cog(self, name):
         cog = self._cogs.pop(name, None)

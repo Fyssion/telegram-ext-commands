@@ -1,4 +1,4 @@
-from .core import Command
+from ._types import _BaseCommand
 
 
 class CogMeta(type):
@@ -22,7 +22,7 @@ class CogMeta(type):
                 is_static_method = isinstance(value, staticmethod)
                 if is_static_method:
                     value = value.__func__
-                if isinstance(value, Command):
+                if isinstance(value, _BaseCommand):
                     if is_static_method:
                         raise TypeError(
                             f"Command in method {base}.{elem!r} must not be staticmethod."
@@ -36,6 +36,11 @@ class CogMeta(type):
         )  # this will be copied in Cog.__new__
 
         return new_cls
+
+
+def _cog_special_method(func):
+    func.__cog_special_method__ = None
+    return func
 
 
 class Cog(metaclass=CogMeta):
@@ -67,6 +72,11 @@ class Cog(metaclass=CogMeta):
 
         return self
 
+    @classmethod
+    def _get_overridden_method(cls, method):
+        """Return None if the method is not overridden. Otherwise returns the overridden method."""
+        return getattr(method.__func__, '__cog_special_method__', method)
+
     def get_commands(self):
         return [c for c in self.__cog_commands__ if not c.parent]
 
@@ -74,7 +84,20 @@ class Cog(metaclass=CogMeta):
     def qualified_name(self):
         return self.__cog_name__
 
+    @_cog_special_method
     def cog_unload(self):
+        pass
+
+    @_cog_special_method
+    def cog_before_invoke(self, ctx):
+        pass
+
+    @_cog_special_method
+    def cog_after_invoke(self, ctx):
+        pass
+
+    @_cog_special_method
+    def cog_check(self, ctx):
         pass
 
     def _inject(self, bot):

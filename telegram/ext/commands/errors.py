@@ -15,6 +15,18 @@ class ConversionError(CommandError):
         self.original = original
 
 
+class CheckFailure(CommandError):
+    pass
+
+
+class NotOwner(CheckFailure):
+    pass
+
+
+class DisabledCommand(CommandError):
+    pass
+
+
 class UserInputError(CommandError):
     pass
 
