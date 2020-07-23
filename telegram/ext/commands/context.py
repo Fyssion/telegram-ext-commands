@@ -15,9 +15,18 @@ class Context:
         self.original_args = context.args
         self.text = self.message.text if self.message else None
         self.me = context.bot
+        self.command_failed = False
 
         self.args = []
         self.kwargs = []
+
+    @property
+    def cog(self):
+        """Returns the cog associated with this context's command. None if it does not exist."""
+
+        if self.command is None:
+            return None
+        return self.command.cog
 
     def send(self, text="", *, reply=None, parse_mode=None, photo=None):
         if photo:

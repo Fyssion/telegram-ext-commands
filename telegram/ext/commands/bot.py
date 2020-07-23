@@ -3,6 +3,7 @@ from telegram.ext import Updater, CommandHandler
 import sys
 import importlib
 import inspect
+import traceback
 
 from . import errors
 from .core import command
@@ -10,6 +11,7 @@ from .cog import Cog
 from .context import Context
 from .view import StringView
 from .help import HelpCommand, DefaultHelpCommand
+from .errors import CommandError
 
 
 class _DefaultRepr:
@@ -295,6 +297,41 @@ class Bot:
             # revert sys.modules back to normal and raise back to caller
             sys.modules.update(modules)
             raise
+
+    def on_command_error(self, ctx, error):
+        """Global error handler that is called when
+        an error is raised when invoking a command.
+
+        The error is only printed if there is no error handler for
+        the command or cog.
+        """
+
+        if hasattr(ctx.command, "on_error"):
+            return
+
+        cog = ctx.cog
+        if cog:
+            if Cog._get_overridden_method(cog.cog_command_error) is not None:
+                return
+
+        print("Ignoring exception in command {}:".format(ctx.command), file=sys.stderr)
+        traceback.print_exception(
+            type(error), error, error.__traceback__, file=sys.stderr
+        )
+
+    def error_handler(self, update, error):
+        """Error handler that is added via
+        :meth:`telegram.ext.Dispatcher.add_error_handler`
+
+        This error handler ignores errors that derive from
+        CommandError, as those errors are handled by
+        :meth:`on_command_error`
+        """
+
+        if isinstance(error, CommandError):
+            return
+
+        raise error
 
     def stop(self):
         self.updater.stop()

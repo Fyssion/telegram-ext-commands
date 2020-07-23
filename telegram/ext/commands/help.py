@@ -3,6 +3,7 @@ import itertools
 import copy
 import unicodedata
 import re
+import html
 
 from .core import Command
 from .errors import CommandError
@@ -565,13 +566,13 @@ class DefaultHelpCommand(HelpCommand):
 
         formatted = []
 
-        formatted.append("<b>{}:</b>".format(heading))
+        formatted.append("<b>{}:</b>".format(html.escape(heading)))
 
         def make_entry(name, doc, *, alias_for=None):
             alias = "[Alias for {}] ".format(alias_for) if alias_for else ""
 
             if doc:
-                return"/{0} - {1}{2}".format(name, alias, doc)
+                return "/{0} - {1}{2}".format(name, alias, html.escape(doc))
             else:
                 entry = "/{}".format(name)
                 if alias:
@@ -591,6 +592,35 @@ class DefaultHelpCommand(HelpCommand):
 
         return formatted
 
+    def format_command(self, command):
+        """A utility function to format the non-indented block of commands and groups.
+
+        Parameters
+        ------------
+        command: :class:`Command`
+            The command to format.
+        """
+
+        help_text = []
+
+        if command.description:
+            help_text.append(html.escape(command.description))
+
+        signature = self.get_command_signature(command)
+        help_text.append(html.escape(signature))
+
+        if command.help:
+            help_text.append(html.escape(command.help))
+
+        if command.examples:
+            help_text.append("")  # blank line
+            help_text.append("<b>Examples:</b>")
+
+            for example in command.examples:
+                help_text.append(html.escape("• /{0} {1}".format(command.name, example)))
+
+        return help_text
+
     def send_help_text(self, help_text):
         destination = self.get_destination()
 
@@ -606,23 +636,19 @@ class DefaultHelpCommand(HelpCommand):
 
         if self.title:
             # <title> portion
-            help_text.append("<b>{}</b>".format(self.title))
+            help_text.append("<b>{}</b>".format(html.escape(self.title)))
             help_text.append("")  # blank line
 
         if bot.description:
             # <description> portion
-            help_text.append(bot.description)
+            help_text.append(html.escape(bot.description))
             help_text.append("")  # blank line
 
         no_category = self.no_category
 
         def get_category(command, *, no_category=no_category):
             cog = command.cog
-            return (
-                cog.qualified_name
-                if cog is not None
-                else no_category
-            )
+            return cog.qualified_name if cog is not None else no_category
 
         filtered = self.filter_commands(
             bot.commands.values(), sort=True, key=get_category
@@ -644,31 +670,9 @@ class DefaultHelpCommand(HelpCommand):
         note = self.get_ending_note()
         if note:
             # help_text.append("")  # blank line
-            help_text.append(note)
+            help_text.append(html.escape(note))
 
         self.send_help_text(help_text)
-
-    def format_command(self, command):
-        """A utility function to format the non-indented block of commands and groups.
-
-        Parameters
-        ------------
-        command: :class:`Command`
-            The command to format.
-        """
-
-        help_text = []
-
-        if command.description:
-            help_text.append(command.description)
-
-        signature = self.get_command_signature(command)
-        help_text.append(signature)
-
-        if command.help:
-            help_text.append(command.help)
-
-        return help_text
 
     def send_command_help(self, command):
         self.send_help_text(self.format_command(command))
@@ -677,7 +681,7 @@ class DefaultHelpCommand(HelpCommand):
         help_text = []
 
         if cog.description:
-            help_text.append(cog.description)
+            help_text.append(html.escape(cog.description))
 
         filtered = self.filter_commands(cog.get_commands(), sort=self.sort_commands)
         help_text.extend(self.format_commands(filtered, heading=self.commands_heading))
@@ -685,6 +689,6 @@ class DefaultHelpCommand(HelpCommand):
         note = self.get_ending_note()
         if note:
             help_text.append("")  # blank line
-            help_text.append(note)
+            help_text.append(html.escape(note))
 
         self.send_help_text(help_text)

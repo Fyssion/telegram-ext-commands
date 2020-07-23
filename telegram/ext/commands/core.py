@@ -14,10 +14,25 @@ from .errors import (
     CheckFailure,
     NotOwner,
     DisabledCommand,
+    CommandInvokeError,
 )
 from . import converter as converters
 from .cog import Cog
 from ._types import _BaseCommand
+
+
+def wrap_callback(func):
+    @functools.wraps(func)
+    def wrapped(*args, **kwargs):
+        try:
+            ret = func(*args, **kwargs)
+        except CommandError:
+            raise
+        except Exception as exc:
+            raise CommandInvokeError(exc) from exc
+        return ret
+
+    return wrapped
 
 
 def _convert_to_bool(argument):
@@ -111,6 +126,22 @@ class Command(_BaseCommand):
         self._after_invoke = func
         return func
 
+    def error(self, func):
+        """A decorator that registers a function as a local error handler.
+
+        A local error handler is an :func:`.on_command_error` event limited to
+        a single command. However, the :func:`.on_command_error` is still
+        invoked afterwards as the catch-all.
+
+        Parameters
+        -----------
+        func: :ref:`function <function>`
+            The function to register as the local error handler.
+        """
+
+        self.on_error = func
+        return func
+
     @property
     def qualified_name(self):
         return self.name
@@ -133,6 +164,9 @@ class Command(_BaseCommand):
             raise ValueError("Missing context parameter") from None
 
         return result
+
+    def __str__(self):
+        return self.qualified_name
 
     @property
     def cog_name(self):
@@ -203,7 +237,7 @@ class Command(_BaseCommand):
             elif self._is_typing_optional(param.annotation):
                 result.append("[%s]" % name)
             else:
-                result.append("[%s]" % name)
+                result.append("<%s>" % name)
 
         return " ".join(result)
 
@@ -231,6 +265,30 @@ class Command(_BaseCommand):
             return self._ensure_assignment_on_copy(copy)
         else:
             return self.copy()
+
+    def dispatch_error(self, ctx, error):
+        ctx.command_failed = True
+        cog = self.cog
+        try:
+            func = self.on_error
+        except AttributeError:
+            pass
+        else:
+            injected = wrap_callback(func)
+            if cog is not None:
+                injected(cog, ctx, error)
+            else:
+                injected(ctx, error)
+
+        try:
+            if cog is not None:
+                local = Cog._get_overridden_method(cog.cog_command_error)
+                if local is not None:
+                    wrapped = wrap_callback(local)
+                    wrapped(ctx, error)
+        finally:
+            wrapped = wrap_callback(ctx.bot.on_command_error)
+            wrapped(ctx, error)
 
     def _actual_conversion(self, ctx, converter, argument, param):
         if converter is bool:
@@ -548,13 +606,23 @@ class Command(_BaseCommand):
     def __call__(self, update, context):
         ctx = self.bot.get_context(self, update, context)
 
-        self.prepare(ctx)
+        # In order to still have the context from the error,
+        # I need to except the error here and call the command
+        # error handlers manually
+        try:
+            self.prepare(ctx)
 
-        ret = self.callback(*ctx.args, **ctx.kwargs)
+            wrapped = wrap_callback(self.callback)
+            ret = wrapped(*ctx.args, **ctx.kwargs)
 
-        self.call_after_hooks(ctx)
+            self.call_after_hooks(ctx)
 
-        return ret
+        except CommandError as exc:
+            ctx.command_failed = True
+            self.dispatch_error(ctx, exc)
+
+        else:
+            return ret
 
 
 def command(*args, **kwargs):

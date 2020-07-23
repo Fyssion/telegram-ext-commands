@@ -5,6 +5,25 @@ class CommandError(telegram.TelegramError):
     pass
 
 
+class CommandInvokeError(CommandError):
+    """Exception raised when the command being invoked raised an exception.
+
+    This inherits from :exc:`CommandError`
+
+    Attributes
+    -----------
+    original
+        The original exception that was raised. You can also get this via
+        the ``__cause__`` attribute.
+    """
+
+    def __init__(self, e):
+        self.original = e
+        super().__init__(
+            "Command raised an exception: {0.__class__.__name__}: {0}".format(e)
+        )
+
+
 class BotException(telegram.TelegramError):
     pass
 

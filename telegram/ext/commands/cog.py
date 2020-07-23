@@ -118,6 +118,25 @@ class Cog(metaclass=CogMeta):
     def cog_check(self, ctx):
         pass
 
+    @_cog_special_method
+    async def cog_command_error(self, ctx, error):
+        """A special method that is called whenever an error
+        is dispatched inside this cog.
+
+        This is similar to :func:`.on_command_error` except only applying
+        to the commands inside this cog.
+
+        This **must** be a coroutine.
+
+        Parameters
+        -----------
+        ctx: :class:`.Context`
+            The invocation context where the error happened.
+        error: :class:`CommandError`
+            The error that happened.
+        """
+        pass
+
     def _inject(self, bot):
         # realistically, the only thing that can cause loading errors
         # is essentially just the command loading, which raises if there are

@@ -25,8 +25,9 @@ Key: [ ] Not started | [/] Incomplete | [x] Complete (I haven't tested it probab
 - [x] Extensions and cogs
 - [x] Argument parsing
 - [ ] Documentation
-- [/] HelpCommand
-- [/] Checks?
+- [x] HelpCommand
+- [x] Checks?
+- [x] Error handling
 - [ ] More that I'm forgetting?
 ```
 
