@@ -57,6 +57,8 @@ class Bot:
                 "WARNING: owner_ids is not set. 'bot.is_owner()' will not work property."
             )
 
+        self.dispatcher.add_error_handler(self.error_handler)
+
     @property
     def help_command(self):
         return self._help_command
