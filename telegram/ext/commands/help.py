@@ -682,6 +682,7 @@ class DefaultHelpCommand(HelpCommand):
 
         if cog.description:
             help_text.append(html.escape(cog.description))
+            help_text.append("")  # blank line
 
         filtered = self.filter_commands(cog.get_commands(), sort=self.sort_commands)
         help_text.extend(self.format_commands(filtered, heading=self.commands_heading))
