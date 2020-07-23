@@ -321,7 +321,7 @@ class Bot:
             type(error), error, error.__traceback__, file=sys.stderr
         )
 
-    def error_handler(self, update, error):
+    def error_handler(self, update, context):
         """Error handler that is added via
         :meth:`telegram.ext.Dispatcher.add_error_handler`
 
@@ -329,6 +329,8 @@ class Bot:
         CommandError, as those errors are handled by
         :meth:`on_command_error`
         """
+
+        error = context.error
 
         if isinstance(error, CommandError):
             return
