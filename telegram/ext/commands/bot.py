@@ -79,7 +79,13 @@ class Bot:
             self._help_command = None
 
     def get_context(self, command, update, context, *, cls=Context):
-        view = StringView(" ".join(context.args))
+        # I need to get the raw message instead of splitting away newlines.
+        # *cough cough* CommandHandler
+        message = update.effective_message
+        args = message.text.split(" ")[1:]
+        content = " ".join(args)
+
+        view = StringView(content)
         ctx = cls(command, update, context, view=view)
         return ctx
 
