@@ -28,7 +28,9 @@ class Context:
             return None
         return self.command.cog
 
-    def send(self, text="", *, reply=None, parse_mode=None, photo=None, reply_markup=None):
+    def send(
+        self, text="", *, reply=None, parse_mode=None, photo=None, reply_markup=None
+    ):
         if photo:
             try:
                 return self.me.send_photo(
@@ -37,7 +39,7 @@ class Context:
                     caption=text,
                     parse_mode=parse_mode,
                     reply_to_message_id=reply,
-                    reply_markup=reply_markup
+                    reply_markup=reply_markup,
                 )
             except error.BadRequest:
                 photo.seek(0)
@@ -48,12 +50,15 @@ class Context:
                     caption=text,
                     parse_mode=parse_mode,
                     reply_to_message_id=reply,
-                    reply_markup=reply_markup
+                    reply_markup=reply_markup,
                 )
 
         return self.me.send_message(
-            self.chat.id, text=text, parse_mode=parse_mode, reply_to_message_id=reply,
-                    reply_markup=reply_markup
+            self.chat.id,
+            text=text,
+            parse_mode=parse_mode,
+            reply_to_message_id=reply,
+            reply_markup=reply_markup,
         )
 
     def reply(self, text="", **kwargs):
