@@ -1,7 +1,7 @@
 from telegram.ext import Updater, CommandHandler
 
 import sys
-import importlib
+import importlib.util
 import inspect
 import traceback
 
