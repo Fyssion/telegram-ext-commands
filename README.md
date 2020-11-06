@@ -3,6 +3,15 @@
 [![GitHub - License](https://img.shields.io/github/license/Fyssion/telegram-ext-commands)](https://github.com/Fyssion/telegram-ext-commands/blob/master/LICENSE)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
+## Archive note
+
+I am no longer maintaining this.
+It was mainly a project to understand the internals of `discord.py`.
+
+See [telegram.py](https://github.com/ilovetocode2019/telegram.py)
+
+<hr>
+
 Port of the [discord.py commands framework](https://discordpy.readthedocs.io/en/latest/ext/commands/index.html) to [python-telegram-bot](https://python-telegram-bot.org/)
 
 This extension is mostly modified discord.py code. I had to make some changes and adjustments to fit with
